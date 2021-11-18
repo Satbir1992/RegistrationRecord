@@ -18,7 +18,7 @@ namespace RegistrationRecord
         {
             InitializeComponent();
         }
-        List<string> NumberList = new List<string> { "1ETU-942", "1DNG-675", "1GSA-650", "ICGA-449" };
+        List<string> NumberList = new List<string> { "1ETU-942", "1DNG-675", "1GSA-650", "1CGA-449" };
         string currentFileName = "";
         #region Display Function
         private void DisplayRego()
@@ -52,6 +52,7 @@ namespace RegistrationRecord
         {
             TextBoxNumber.Clear();
             TextBoxNumber.Focus();
+            VehiclePlateDisplay.SelectedIndex = -1;
             
         }
          
@@ -171,6 +172,7 @@ namespace RegistrationRecord
                     MessageBox.Show("Vehicle Number "+TextBoxNumber.Text + " is parked in line " +(VehiclePlateDisplay.Items.IndexOf(TextBoxNumber.Text)+1));
                 else
                     MessageBox.Show("Not Found");
+
                 
             }
             else
@@ -281,11 +283,15 @@ namespace RegistrationRecord
         {
             string fileName = "demo_01.txt";
             SaveFileDialog SaveText = new SaveFileDialog();
+            
             DialogResult sr = SaveText.ShowDialog();
             SaveText.Filter = "|*.txt";
             if (sr == DialogResult.OK)
             {
                 fileName = SaveText.FileName;
+                
+
+
             }
             if (sr == DialogResult.Cancel)
             {
@@ -294,7 +300,7 @@ namespace RegistrationRecord
             // Validate file name and increment
             try
             {
-                using (StreamWriter writer = new StreamWriter(fileName, false))
+                using (StreamWriter writer = new StreamWriter(fileName))
                 {
                     foreach (var number in NumberList)
                     {
@@ -306,12 +312,15 @@ namespace RegistrationRecord
             {
                 MessageBox.Show("File NOT saved");
             }
+            this.Close();
         }
 
         private void ButtonOpen_Click(object sender, EventArgs e)
         {
             string fileName = "demo_01.txt";
             OpenFileDialog OpenText = new OpenFileDialog();
+            OpenText.Filter = "|*.txt";
+
             DialogResult sr = OpenText.ShowDialog();
             if (sr == DialogResult.OK)
             {
@@ -352,6 +361,7 @@ namespace RegistrationRecord
         private void TextBoxNumber_Validating(object sender, CancelEventArgs e)
         {
             TextBoxNumber.MaxLength = 8;
+            TextBoxNumber.Text.Split();
         }
     }
  
