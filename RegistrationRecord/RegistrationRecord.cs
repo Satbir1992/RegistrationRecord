@@ -9,6 +9,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace RegistrationRecord
 {
@@ -18,7 +19,7 @@ namespace RegistrationRecord
         {
             InitializeComponent();
         }
-        List<string> NumberList = new List<string> { "1ETU-942", "1DNG-675", "1GSA-650", "ICGA-449" };
+        List<string> NumberList = new List<string> { "1ETU-942", "1DNG-675", "1GSA-650", "1CGA-449" };
         string currentFileName = "";
         #region Display Function
         private void DisplayRego()
@@ -52,6 +53,7 @@ namespace RegistrationRecord
         {
             TextBoxNumber.Clear();
             TextBoxNumber.Focus();
+            VehiclePlateDisplay.SelectedIndex = -1;
             
         }
          
@@ -59,7 +61,6 @@ namespace RegistrationRecord
         private void RegistrationRecord_Load(object sender, EventArgs e)
         {
             TextBoxNumber.CharacterCasing = CharacterCasing.Upper;
-            TextBoxNumber.MaxLength = 8;
             DisplayRego();
             
             
@@ -171,6 +172,7 @@ namespace RegistrationRecord
                     MessageBox.Show("Vehicle Number "+TextBoxNumber.Text + " is parked in line " +(VehiclePlateDisplay.Items.IndexOf(TextBoxNumber.Text)+1));
                 else
                     MessageBox.Show("Not Found");
+
                 
             }
             else
@@ -279,26 +281,58 @@ namespace RegistrationRecord
 
         private void ButtonSave_Click(object sender, EventArgs e)
         {
-            string fileName = "demo_01.txt";
+            SaveFile();
+            this.Close();
+           
+        }
+        private string GetNextFileName(string filename)
+        {
+            filename = "demo.txt";
+            int i = 0;
+            string extension = Path.GetExtension(filename);
+            string pathName = Path.GetDirectoryName(filename);
+            string fileNameOnly = Path.Combine(pathName, Path.GetFileNameWithoutExtension(filename));
+            
+            // If the file exists, keep trying until it doesn't
+            while (File.Exists(filename))
+            {
+                i += 1;
+                if(i < 10)
+                filename = string.Format("{0}{1}{2}", fileNameOnly+"_0", i, extension);
+                else
+                    filename = string.Format("{0}{1}{2}", fileNameOnly + "_", i, extension);
+            }
+            return filename;
+        }
+        private void SaveFile()
+        {
+            string fileName = GetNextFileName(".txt");
             SaveFileDialog SaveText = new SaveFileDialog();
+            
+            SaveText.Filter = "txt|*.txt";
             DialogResult sr = SaveText.ShowDialog();
-            SaveText.Filter = "|*.txt";
+            
             if (sr == DialogResult.OK)
             {
                 fileName = SaveText.FileName;
+                
             }
+            
+                          
             if (sr == DialogResult.Cancel)
             {
+                
                 SaveText.FileName = fileName;
             }
+           
             // Validate file name and increment
             try
             {
                 using (StreamWriter writer = new StreamWriter(fileName, false))
                 {
-                    foreach (var number in NumberList)
+                    foreach (var colour in NumberList)
                     {
-                        writer.WriteLine(number);
+                        writer.WriteLine(colour);
                     }
                 }
             }
@@ -307,11 +341,13 @@ namespace RegistrationRecord
                 MessageBox.Show("File NOT saved");
             }
         }
-
         private void ButtonOpen_Click(object sender, EventArgs e)
         {
-            string fileName = "demo_01.txt";
+            string fileName = "demo.txt";
             OpenFileDialog OpenText = new OpenFileDialog();
+            
+            OpenText.Filter = "txt|*.txt";
+
             DialogResult sr = OpenText.ShowDialog();
             if (sr == DialogResult.OK)
             {
@@ -339,6 +375,8 @@ namespace RegistrationRecord
         private void TextBoxNumber_KeyPress(object sender, KeyPressEventArgs e)
         {
             TextBoxNumber.MaxLength = 8;
+            string pattern = @"1ABC-123";
+            Regex p = new Regex(pattern);
             if(!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
             {
                 e.Handled = true;
@@ -352,6 +390,7 @@ namespace RegistrationRecord
         private void TextBoxNumber_Validating(object sender, CancelEventArgs e)
         {
             TextBoxNumber.MaxLength = 8;
+            TextBoxNumber.Text.Split();
         }
     }
  
