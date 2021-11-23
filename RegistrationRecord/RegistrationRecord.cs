@@ -10,6 +10,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+//Satbir Singh
+//20/11/2021
+/*This Application will keep the record of the rego number who enter in to the parking 
+and allows user to save and open that data, with the tag, modify and search option*/
 
 namespace RegistrationRecord
 {
@@ -19,120 +23,165 @@ namespace RegistrationRecord
         {
             InitializeComponent();
         }
-        List<string> NumberList = new List<string> { "1ETU-942", "1DNG-675", "1GSA-650", "1CGA-449" };
+        List<string> NumberList = new List<string> { "1ETU942", "1DNG675", "1GSA650", "1CGA449" };
+
         string currentFileName = "";
         #region Display Function
-        private void DisplayRego()
+        private void DisplayRego()//Display Rego Numbers In list box
         {
-            
-            VehiclePlateDisplay.Items.Clear();
+            var rx = new Regex(@"^1[A-Z][A-Z][A-Z][0-9][0-9][0-9]$");//Will validate pattern for rego number starting with 1
+            var rx1 = new Regex(@"^Z[1][A-Z][A-Z][A-Z][0-9][0-9][0-9]$");//Will validate pattern for rego number starting with Z
             NumberList.Sort();
-            foreach (var number in NumberList)
+            try
             {
-                VehiclePlateDisplay.Items.Add(number);
+                foreach (var number in NumberList)
+                {
+                    if (rx.IsMatch(number) || rx1.IsMatch(number))
+                    {
+                        VehiclePlateDisplay.Items.Add(number);
+                    }
+
+                    else
+                    {
+                        toolStripStatusLabel1.Text = "Invalid Rego number";
+                    }
+                }
             }
-        }
-        
-        #endregion
+            catch (IOException)
+            {
+                MessageBox.Show("Someting went wrong please check the file or number in file");
+            }
 
-       #region WrongClick
-        private void label1_Click(object sender, EventArgs e)
-        {
+
+
 
         }
 
-        private void VehiclePlateDisplay_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
-           
-        }
-       
         #endregion
         #region Utilities
-        private void TextBoxClearFocus()
+        private void TextBoxClearFocus()//Clear text box and selected index after any button press
         {
             TextBoxNumber.Clear();
             TextBoxNumber.Focus();
             VehiclePlateDisplay.SelectedIndex = -1;
-            
-        }
-         
-        #endregion
-        private void RegistrationRecord_Load(object sender, EventArgs e)
-        {
-            TextBoxNumber.CharacterCasing = CharacterCasing.Upper;
-            DisplayRego();
-            
-            
-        }
-
-        private void ButtonEnter_Click(object sender, EventArgs e)
-        {
-            
-            if (TextBoxNumber.Text != "")
-            {
-                if (VehiclePlateDisplay.Items.Contains(TextBoxNumber.Text))
-                {
-                    toolStripStatusLabel1.Text = "Duplicate Rego number can not be added";
-                }
-                else
-                {
-                    NumberList.Add(TextBoxNumber.Text);
-                    toolStripStatusLabel1.Text = "Successfully Added";
-                }
-                
-            }
-            else
-            {
-                MessageBox.Show("Enter the Number in Box","System Information",MessageBoxButtons.OK,MessageBoxIcon.Error);
-                
-            }
-            DisplayRego();
-            TextBoxClearFocus();
-            
-        }
-
-        private void ButtonReset_Click(object sender, EventArgs e)
-        {
-            
-            NumberList.Clear();
-            VehiclePlateDisplay.Items.Clear();
-                   
 
         }
-
-        private void RegistrationRecord_MouseMove(object sender, MouseEventArgs e)
+        private void RegistrationRecord_MouseMove(object sender, MouseEventArgs e)//tool strip empty on mouse move
         {
             toolStripStatusLabel1.Text = "";
         }
 
-             
+
+        private void RegistrationRecord_Load(object sender, EventArgs e)//Display Pre loaded rego number on start
+        {
+            TextBoxNumber.CharacterCasing = CharacterCasing.Upper;
+            DisplayRego();
+
+
+        }
+        private void TextBoxNumber_KeyPress(object sender, KeyPressEventArgs e)//Wont Allow any Characters in Text Box
+        {
+            if (!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true;
+                toolStripStatusLabel1.Text = "No Character should be in Rego Number";
+            }
+
+
+
+        }
+
+        private void TextBoxNumber_Validating(object sender, CancelEventArgs e)
+        {
+            TextBoxNumber.MaxLength = 8;
+
+        }
+        private void VehiclePlateDisplay_Click(object sender, EventArgs e)//Display The Selected item from the list to text box on click
+        {
+            if (VehiclePlateDisplay.SelectedItem != null)
+            {
+
+                TextBoxNumber.Text = VehiclePlateDisplay.SelectedItem.ToString();
+
+            }
+            else
+            {
+                toolStripStatusLabel1.Text = "Select a number from the List";
+
+            }
+
+        }
+        #endregion Utilities
+        #region Enter Vehicle Region
+        private void ButtonEnter_Click(object sender, EventArgs e)
+        {
+
+
+            if (TextBoxNumber.Text != "")//Run only if number entered in text box
+            {
+                if (VehiclePlateDisplay.Items.Contains(TextBoxNumber.Text))
+                {
+                    toolStripStatusLabel1.Text = "Duplicate Rego number can not be added";// Will Not Allow Duplicate Numbers
+                }
+                else
+                {
+                    NumberList.Add(TextBoxNumber.Text);//Add Number TO the list
+                    toolStripStatusLabel1.Text = "Successfully Added";
+                }
+
+            }
+            else
+            {
+                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            }
+            DisplayRego();
+            TextBoxClearFocus();
+
+        }
+        #endregion EnterVehicle
+        #region Rego Reset Region
+        private void ButtonReset_Click(object sender, EventArgs e)//Clear Numbers From both list and display
+        {
+
+            VehiclePlateDisplay.Items.Clear();
+            NumberList.Clear();
+            TextBoxClearFocus();
+            MessageBox.Show("Number List Is Empty", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+
+
+
+        }
+        #endregion Rego Reset
+        #region Vehicle Exit Region      
         private void ButtonExit_Click(object sender, EventArgs e)
         {
-                       
-           if (TextBoxNumber.Text != "")
+
+            if (TextBoxNumber.Text != "")
             {
-                
-                foreach (var search in NumberList)
+
+                foreach (var search in NumberList)// Search for the number entered or selected
                 {
 
-                    if (TextBoxNumber.Text == search)
+                    if (TextBoxNumber.Text == search)//if found then will delete it from list and display 
                     {
 
                         NumberList.Remove(search);
                         VehiclePlateDisplay.Items.Remove(search);
-                        toolStripStatusLabel1.Text = "Vehicle Rego Successfully removed";
+                        MessageBox.Show("Vehicle Number " + search + " has left the parking ");
                         TextBoxClearFocus();
-                        
+
                         break;
                     }
                     else
                     {
                         toolStripStatusLabel1.Text = "Vehicle Rego not in list";
                     }
-                        
-                    
-                                      
+
+
+
 
                 }
 
@@ -141,198 +190,193 @@ namespace RegistrationRecord
             }
             else
             {
-                toolStripStatusLabel1.Text = "Select a Rego Number From the List or Enter Rego Number in Vehicle plate details box";
+                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-                
-            
-        }
 
-        private void VehiclePlateDisplay_Click(object sender, EventArgs e)
-        {
-            if (VehiclePlateDisplay.SelectedItem != null)
-            {
-                
-                TextBoxNumber.Text = VehiclePlateDisplay.SelectedItem.ToString();
-                
-            }
-            else
-            {
-                toolStripStatusLabel1.Text = "Select a number from the List";
-                
-            }
-            
-        }
 
-        private void ButtonBinarySearch_Click(object sender, EventArgs e)
+        }
+        #endregion Vehicle Exit
+        #region Binary Search Region
+        private void ButtonBinarySearch_Click(object sender, EventArgs e)//Inbuilt Binary Search Method
         {
             if (TextBoxNumber.Text != "")
             {
                 NumberList.Sort();
                 if (NumberList.BinarySearch(TextBoxNumber.Text) >= 0)
-                    MessageBox.Show("Vehicle Number "+TextBoxNumber.Text + " is parked in line " +(VehiclePlateDisplay.Items.IndexOf(TextBoxNumber.Text)+1));
+                    MessageBox.Show("Vehicle Number " + TextBoxNumber.Text + " is parked in line " + (VehiclePlateDisplay.Items.IndexOf(TextBoxNumber.Text) + 1));
                 else
-                    MessageBox.Show("Not Found");
+                    MessageBox.Show("Vehicle Number" + TextBoxNumber.Text + "is not found in the parking");
 
-                
+
             }
             else
             {
-                toolStripStatusLabel1.Text = "Enter Rego Number";
+                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             TextBoxClearFocus();
-            
-            
-        }
 
-        private void ButtonLinearSearch_Click(object sender, EventArgs e)
+
+        }
+        #endregion Binary Search
+        #region Linear Search Region
+        private void ButtonLinearSearch_Click(object sender, EventArgs e)//Search Number Based on Linear Search
         {
             bool found = false;
             if (TextBoxNumber.Text != "")
             {
-                
-                
-                foreach (var target in NumberList)
+
+
+                foreach (var target in NumberList)// Search For the number in the list entered in the text box or selected from list
                 {
 
-                    
-                    
+
+
                     if (target == TextBoxNumber.Text)
                     {
                         found = true;
                         break;
                     }
                 }
-                if (found)
+                if (found)//display this if found
                 {
-                    MessageBox.Show("Vehicle Number "+TextBoxNumber.Text + " is parked in line " + (VehiclePlateDisplay.Items.IndexOf(TextBoxNumber.Text)+1),
+                    MessageBox.Show("Vehicle Number " + TextBoxNumber.Text + " is parked in line " + (VehiclePlateDisplay.Items.IndexOf(TextBoxNumber.Text) + 1),
                        "System Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    
+
                 }
-                else
-                    MessageBox.Show("Number not found",
+                else// display this if not found
+                    MessageBox.Show("Vehicle number not found",
                         "System Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                
+
 
             }
-            else
+            else//Show error message if nothing selected or nothing in the text box 
             {
-                toolStripStatusLabel1.Text = "Search Failed: Please enter rego number into text box";
+                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
-            
+
             TextBoxClearFocus();
         }
-
-        private void ButtonModify_Click(object sender, EventArgs e)
+        #endregion Linear Search
+        #region Modify Number Region
+        private void ButtonModify_Click(object sender, EventArgs e)//update rego number if user need to edit it manually
         {
-            if(VehiclePlateDisplay.SelectedIndex != -1)
+            var rx = new Regex(@"^1[A-Z][A-Z][A-Z][0-9][0-9][0-9]$");
+            if (VehiclePlateDisplay.SelectedIndex != -1 && rx.IsMatch(TextBoxNumber.Text))// only works if user select the number from the list
             {
-             DialogResult modifyTask = MessageBox.Show("Do you want to Continue?", "It will permanently modify the data.", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult modifyTask = MessageBox.Show("Do you want to Continue?", "It will permanently modify the data.", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
-                    if (modifyTask == DialogResult.Yes)
+                if (modifyTask == DialogResult.Yes)
 
-                    {
-                        
-                        int idx = VehiclePlateDisplay.Items.IndexOf(VehiclePlateDisplay.SelectedItem);
+                {
 
-                        NumberList.RemoveAt(idx);
-                        NumberList.Insert(idx, TextBoxNumber.Text);
+                    int idx = VehiclePlateDisplay.Items.IndexOf(VehiclePlateDisplay.SelectedItem);// get the index of selected number
+
+                    NumberList.RemoveAt(idx);//semove that index number
+                    NumberList.Insert(idx, TextBoxNumber.Text);//insert the user input to that index if valid patten for rego
                     toolStripStatusLabel1.Text = "Rego Number Successfully Changed";
 
-                    }
-                    else
-                    {
+                }
+                else
+                {
                     toolStripStatusLabel1.Text = "User had cancelled to modify";
-                    }
-                
-             
+                }
+
+
             }
             else
             {
-                toolStripStatusLabel1.Text = "User need to select data from the list";
+                MessageBox.Show("Select Number From The List or Enter Valid Format to Modify", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             DisplayRego();
             TextBoxClearFocus();
         }
-
-        private void ButtonTag_Click(object sender, EventArgs e)
+        #endregion Modify Number
+        #region Tag Number Region
+        private void ButtonTag_Click(object sender, EventArgs e)// Tag the rego number with a Character "Z"
         {
             tagItem();
+            DisplayRego();
+            TextBoxClearFocus();
         }
-        private void tagItem()
+        private void tagItem()//Function for tag number
         {
-            
-            if(VehiclePlateDisplay.SelectedIndex != -1)
+
+            if (VehiclePlateDisplay.SelectedIndex != -1)
             {
-                
+
                 int idx = VehiclePlateDisplay.Items.IndexOf(VehiclePlateDisplay.SelectedItem);
-                
+
                 NumberList.RemoveAt(idx);
                 NumberList.Insert(idx, "Z" + TextBoxNumber.Text);
-                
                 toolStripStatusLabel1.Text = "Rego Number Successfully tagged";
+
             }
             else
             {
-                toolStripStatusLabel1.Text = "User need to select data from the list";
-            }
-            DisplayRego();
-        }
+                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-        private void ButtonSave_Click(object sender, EventArgs e)
+            }
+
+        }
+        #endregion Tag Number
+        #region File Save Region
+        private void ButtonSave_Click(object sender, EventArgs e)//Save the file as text file
         {
             SaveFile();
             this.Close();
-           
+
         }
-        private string GetNextFileName(string filename)
+        private string GetNextFileName(string filename)// Generate the name of the file according to requirement  
         {
             filename = "demo.txt";
             int i = 0;
             string extension = Path.GetExtension(filename);
             string pathName = Path.GetDirectoryName(filename);
             string fileNameOnly = Path.Combine(pathName, Path.GetFileNameWithoutExtension(filename));
-            
+            filename = string.Format("{0}{1}{2}", fileNameOnly + "_0", i, extension);//give the first file name
+
             // If the file exists, keep trying until it doesn't
-            while (File.Exists(filename))
+            while (File.Exists(filename))// only runs if file name already exists
             {
                 i += 1;
-                if(i < 10)
-                filename = string.Format("{0}{1}{2}", fileNameOnly+"_0", i, extension);
-                else
+                if (i < 10)// runs if file vesion with same name less than 10
+                    filename = string.Format("{0}{1}{2}", fileNameOnly + "_0", i, extension);
+                else//runs for file version after 10
                     filename = string.Format("{0}{1}{2}", fileNameOnly + "_", i, extension);
             }
             return filename;
         }
-        private void SaveFile()
+        private void SaveFile()// Function for Saving a file 
         {
             string fileName = GetNextFileName(".txt");
             SaveFileDialog SaveText = new SaveFileDialog();
-            
-            SaveText.Filter = "txt|*.txt";
+
+            SaveText.Filter = "text files|*.txt";//Text File Display Filter
             DialogResult sr = SaveText.ShowDialog();
-            
-            if (sr == DialogResult.OK)
+
+            if (sr == DialogResult.OK)// Save the file with the name user enetered
             {
                 fileName = SaveText.FileName;
-                
+
             }
-            
-                          
-            if (sr == DialogResult.Cancel)
+
+
+            if (sr == DialogResult.Cancel)//ALso save the file but with auto incermented name
             {
-                
+
                 SaveText.FileName = fileName;
+                MessageBox.Show("File Saved with auto name with an increment in version");
             }
-           
+
             // Validate file name and increment
             try
             {
                 using (StreamWriter writer = new StreamWriter(fileName, false))
                 {
-                    foreach (var colour in NumberList)
+                    foreach (var number in NumberList)
                     {
-                        writer.WriteLine(colour);
+                        writer.WriteLine(number);//Write the numberList on to a text file 
                     }
                 }
             }
@@ -341,15 +385,17 @@ namespace RegistrationRecord
                 MessageBox.Show("File NOT saved");
             }
         }
-        private void ButtonOpen_Click(object sender, EventArgs e)
+        #endregion File Save
+        #region File Open Region
+        private void ButtonOpen_Click(object sender, EventArgs e)//Open only text file
         {
             string fileName = "demo.txt";
             OpenFileDialog OpenText = new OpenFileDialog();
-            
-            OpenText.Filter = "txt|*.txt";
+
+            OpenText.Filter = "text files|*.txt";
 
             DialogResult sr = OpenText.ShowDialog();
-            if (sr == DialogResult.OK)
+            if (sr == DialogResult.OK)// OPen the selected Text File
             {
                 fileName = OpenText.FileName;
             }
@@ -361,37 +407,32 @@ namespace RegistrationRecord
                 {
                     while (!reader.EndOfStream)
                     {
-                        NumberList.Add(reader.ReadLine());
+                        NumberList.Add(reader.ReadLine());//Read the TExt or number from the file
                     }
                 }
-                DisplayRego();
+                DisplayRego();//display after reading
             }
             catch (IOException)
             {
                 MessageBox.Show("file not openned");
+                this.Close();
             }
         }
-
-        private void TextBoxNumber_KeyPress(object sender, KeyPressEventArgs e)
+        #endregion File Open
+        #region WrongClick
+        private void label1_Click(object sender, EventArgs e)
         {
-            TextBoxNumber.MaxLength = 8;
-            string pattern = @"1ABC-123";
-            Regex p = new Regex(pattern);
-            if(!char.IsLetterOrDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
-            {
-                e.Handled = true;
-                toolStripStatusLabel1.Text = "No Character should be in Rego Number"; 
-            }
-                  
-            
 
         }
 
-        private void TextBoxNumber_Validating(object sender, CancelEventArgs e)
+        private void VehiclePlateDisplay_SelectedIndexChanged(object sender, EventArgs e)
         {
-            TextBoxNumber.MaxLength = 8;
-            TextBoxNumber.Text.Split();
+
+
         }
+
+        #endregion
+
     }
- 
+
 }
