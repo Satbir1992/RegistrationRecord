@@ -64,7 +64,7 @@ namespace RegistrationRecord
             // 
             this.TextBoxNumber.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TextBoxNumber.Location = new System.Drawing.Point(184, 42);
-            this.TextBoxNumber.MaxLength = 6;
+            this.TextBoxNumber.MaxLength = 8;
             this.TextBoxNumber.Name = "TextBoxNumber";
             this.TextBoxNumber.Size = new System.Drawing.Size(117, 26);
             this.TextBoxNumber.TabIndex = 2;
@@ -214,6 +214,7 @@ namespace RegistrationRecord
             this.VehiclePlateDisplay.Name = "VehiclePlateDisplay";
             this.VehiclePlateDisplay.Size = new System.Drawing.Size(130, 346);
             this.VehiclePlateDisplay.TabIndex = 13;
+            this.toolTip1.SetToolTip(this.VehiclePlateDisplay, "Vehicle Number DIsplay List");
             this.VehiclePlateDisplay.Click += new System.EventHandler(this.VehiclePlateDisplay_Click);
             this.VehiclePlateDisplay.SelectedIndexChanged += new System.EventHandler(this.VehiclePlateDisplay_SelectedIndexChanged);
             // 
@@ -223,9 +224,9 @@ namespace RegistrationRecord
             this.label2.Font = new System.Drawing.Font("Segoe Print", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(32, 20);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(134, 21);
+            this.label2.Size = new System.Drawing.Size(131, 21);
             this.label2.TabIndex = 14;
-            this.label2.Text = "Vehicle Plate Display";
+            this.label2.Text = "Vehicle Plate Screen";
             // 
             // RegistrationRecord
             // 
