@@ -214,6 +214,7 @@ namespace RegistrationRecord
             this.VehiclePlateDisplay.Name = "VehiclePlateDisplay";
             this.VehiclePlateDisplay.Size = new System.Drawing.Size(130, 346);
             this.VehiclePlateDisplay.TabIndex = 13;
+            this.toolTip1.SetToolTip(this.VehiclePlateDisplay, "Vehicle Number DIsplay List");
             this.VehiclePlateDisplay.Click += new System.EventHandler(this.VehiclePlateDisplay_Click);
             this.VehiclePlateDisplay.SelectedIndexChanged += new System.EventHandler(this.VehiclePlateDisplay_SelectedIndexChanged);
             // 

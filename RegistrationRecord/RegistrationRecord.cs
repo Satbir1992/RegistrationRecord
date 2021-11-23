@@ -31,6 +31,9 @@ namespace RegistrationRecord
         {
             var rx = new Regex(@"^1[A-Z][A-Z][A-Z][0-9][0-9][0-9]$");//Will validate pattern for rego number starting with 1
             var rx1 = new Regex(@"^Z[1][A-Z][A-Z][A-Z][0-9][0-9][0-9]$");//Will validate pattern for rego number starting with Z
+            
+            
+            VehiclePlateDisplay.Items.Clear();
             NumberList.Sort();
             try
             {
@@ -132,7 +135,7 @@ namespace RegistrationRecord
             }
             else
             {
-                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Enter the Number in Text Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
             DisplayRego();
@@ -171,26 +174,20 @@ namespace RegistrationRecord
                         NumberList.Remove(search);
                         VehiclePlateDisplay.Items.Remove(search);
                         MessageBox.Show("Vehicle Number " + search + " has left the parking ");
-                        TextBoxClearFocus();
-
                         break;
                     }
                     else
                     {
                         toolStripStatusLabel1.Text = "Vehicle Rego not in list";
+
                     }
-
-
-
-
                 }
-
                 DisplayRego();
                 TextBoxClearFocus();
             }
             else
             {
-                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Enter the Number in Text Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
 
@@ -205,13 +202,13 @@ namespace RegistrationRecord
                 if (NumberList.BinarySearch(TextBoxNumber.Text) >= 0)
                     MessageBox.Show("Vehicle Number " + TextBoxNumber.Text + " is parked in line " + (VehiclePlateDisplay.Items.IndexOf(TextBoxNumber.Text) + 1));
                 else
-                    MessageBox.Show("Vehicle Number" + TextBoxNumber.Text + "is not found in the parking");
+                    MessageBox.Show("Vehicle Number " + TextBoxNumber.Text + " is not found in the parking");
 
 
             }
             else
             {
-                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Enter the Number in Text Box or select from the list ", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             TextBoxClearFocus();
 
@@ -244,14 +241,14 @@ namespace RegistrationRecord
 
                 }
                 else// display this if not found
-                    MessageBox.Show("Vehicle number not found",
+                    MessageBox.Show("Vehicle number "+TextBoxNumber.Text + " not found",
                         "System Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
             }
             else//Show error message if nothing selected or nothing in the text box 
             {
-                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Enter the Number in Text Box or Select from the list", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
 
@@ -295,26 +292,34 @@ namespace RegistrationRecord
         #region Tag Number Region
         private void ButtonTag_Click(object sender, EventArgs e)// Tag the rego number with a Character "Z"
         {
-            tagItem();
+            TagItem();
             DisplayRego();
             TextBoxClearFocus();
         }
-        private void tagItem()//Function for tag number
+        private void TagItem()//Function for tag number
         {
 
-            if (VehiclePlateDisplay.SelectedIndex != -1)
+            if (VehiclePlateDisplay.SelectedIndex != -1 || TextBoxNumber.Text !="")
             {
+                try
+                {
+                    int idx = VehiclePlateDisplay.Items.IndexOf(TextBoxNumber.Text);
+                    NumberList.RemoveAt(idx);
+                    NumberList.Insert(idx, "Z" + TextBoxNumber.Text);
+                    toolStripStatusLabel1.Text = "Rego Number Successfully tagged";
+                }
+                catch(Exception)
+                {
+                    MessageBox.Show("Number not in the list", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                int idx = VehiclePlateDisplay.Items.IndexOf(VehiclePlateDisplay.SelectedItem);
+                }
 
-                NumberList.RemoveAt(idx);
-                NumberList.Insert(idx, "Z" + TextBoxNumber.Text);
-                toolStripStatusLabel1.Text = "Rego Number Successfully tagged";
+
 
             }
             else
             {
-                MessageBox.Show("Enter the Number in Box", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Enter the Number in Text Box or select from list ", "System Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
 
@@ -351,7 +356,6 @@ namespace RegistrationRecord
         {
             string fileName = GetNextFileName(".txt");
             SaveFileDialog SaveText = new SaveFileDialog();
-
             SaveText.Filter = "text files|*.txt";//Text File Display Filter
             DialogResult sr = SaveText.ShowDialog();
 
